@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Mobile First Navigation -->
+<nav th:fragment="navigation" class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/}">BookSys</a>
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}"
+                       th:classappend="${#httpServletRequest.requestURI == '/'} ? 'active'">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/books}"
+                       th:classappend="${#httpServletRequest.requestURI.startsWith('/books')} ? 'active'">
+                        Books
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/publishers}"
+                       th:classappend="${#httpServletRequest.requestURI.startsWith('/publishers')} ? 'active'">
+                        Publishers
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/genres}"
+                       th:classappend="${#httpServletRequest.requestURI.startsWith('/genres')} ? 'active'">
+                        Genres
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Add space for fixed navbar -->
+<style th:inline="none">
+    body {
+        padding-top: 56px;
+    }
+    @media (min-width: 992px) {
+        body {
+            padding-top: 0;
+            padding-left: 280px;
+        }
+    }
+</style>
+</body>
+</html>

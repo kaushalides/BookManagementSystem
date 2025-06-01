@@ -1,0 +1,87 @@
+@startuml
+skinparam style strictuml
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+package "com.learnjavawithkaushi.BookManagementSystem.models" {
+    class Book <<Model>> {
+        - Long id
+        - String title
+        - String isbn
+        - Integer publicationYear
+        - List<Genre> genres
+        - Publisher publisher
+    }
+
+    class Publisher <<Model>> {
+        - Long id
+        - String name
+        - String address
+        - String contactInfo
+        - List<Book> books
+    }
+
+    class Genre <<Model>> {
+        - String name
+        - String description
+    }
+
+    Book --> Publisher
+    Book --> "List<Genre>" Genre
+    Publisher --> "List<Book>" Book
+}
+
+package "com.learnjavawithkaushi.BookManagementSystem.repositories" {
+    interface BookRepository <<Repository>> {
+        + findByTitleContainingIgnoreCaseOrIsbnContainingIgnoreCase()
+    }
+
+    interface PublisherRepository <<Repository>>
+}
+
+package "com.learnjavawithkaushi.BookManagementSystem.services" {
+    class BookService <<Service>> {
+        - BookRepository bookRepository
+        + countBooksByGenre()
+        + countBooksByPublisher()
+        + findAll()
+        + searchBooks()
+        + save()
+        + findById()
+        + deleteById()
+    }
+
+    class PublisherService <<Service>> {
+        - PublisherRepository publisherRepository
+        + findAll()
+        + save()
+        + findById()
+        + deleteById()
+    }
+
+    BookService --> BookRepository
+    PublisherService --> PublisherRepository
+}
+
+package "com.learnjavawithkaushi.BookManagementSystem.controllers" {
+    class BookController <<Controller>> {
+        - BookService bookService
+        - PublisherService publisherService
+    }
+
+    class PublisherController <<Controller>> {
+        - PublisherService publisherService
+    }
+
+    class DashboardController <<Controller>> {
+        - BookService bookService
+        - PublisherService publisherService
+    }
+
+    BookController --> BookService
+    BookController --> PublisherService
+    PublisherController --> PublisherService
+    DashboardController --> BookService
+    DashboardController --> PublisherService
+}
+@enduml

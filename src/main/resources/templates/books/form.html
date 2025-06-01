@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title th:text="${book.id} == null ? 'Add Book' : 'Edit Book'">Book Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .sidebar .nav-link {
+            color: #333;
+        }
+        .sidebar .nav-link.active {
+            background-color: rgba(13, 110, 253, 0.25);
+            color: #0d6efd;
+            font-weight: 600;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: auto;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link" href="/">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="/books">Books</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/publishers">Publishers</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 content-container">
+            <div class="form-container">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h2 class="mb-0" th:text="${book.id} == null ? 'Add New Book' : 'Edit Book'"></h2>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{${formAction}}" th:object="${book}" method="post"  onsubmit="reindexGenres()">
+                            <input type="hidden" th:field="*{id}" />
+
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" th:field="*{title}" class="form-control" id="title" required />
+                                <div th:if="${#fields.hasErrors('title')}" class="text-danger" th:errors="*{title}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="isbn" class="form-label">ISBN</label>
+                                <input type="text" th:field="*{isbn}" class="form-control" id="isbn" required />
+                                <div th:if="${#fields.hasErrors('isbn')}" class="text-danger" th:errors="*{isbn}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="publicationYear" class="form-label">Publication Year</label>
+                                <input type="number" th:field="*{publicationYear}" class="form-control" id="publicationYear" required />
+                                <div th:if="${#fields.hasErrors('publicationYear')}" class="text-danger" th:errors="*{publicationYear}"></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="publisher" class="form-label">Publisher</label>
+                                <select th:field="*{publisher.id}" class="form-select" id="publisher" required>
+                                    <option value="" disabled th:selected="${book.publisher == null || book.publisher.id == null}">Select Publisher</option>
+                                    <option th:each="pub : ${publishers}" th:value="${pub.id}" th:text="${pub.name}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Dynamic Genres -->
+                            <div class="mb-3">
+                                <label class="form-label">Genres</label>
+                                <div id="genres-container">
+                                    <div th:each="genre, iterStat : *{genres}" class="genre-item border p-3 mb-2 rounded">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <input type="text" th:field="*{genres[__${iterStat.index}__].name}" class="form-control" placeholder="Genre Name" />
+                                            </div>
+                                            <div class="col-md-5">
+                                                <input type="text" th:field="*{genres[__${iterStat.index}__].description}" class="form-control" placeholder="Genre Description" />
+                                            </div>
+                                            <div class="col-md-2 text-end">
+                                                <button type="button" class="btn btn-danger btn-sm" onclick="removeGenre(this)">Remove</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-secondary btn-sm mt-2" onclick="addGenre()">Add Genre</button>
+                            </div>
+
+
+                            <div class="mt-4 d-flex justify-content-between">
+                                <a href="/books" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary" th:text="${book.id} == null ? 'Add Book' : 'Update Book'"></button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    function reindexGenres() {
+        const genreItems = document.querySelectorAll('#genres-container .genre-item');
+        genreItems.forEach((item, index) => {
+            const nameInput = item.querySelector('input[name$=".name"]');
+            const descInput = item.querySelector('input[name$=".description"]');
+
+            if (nameInput) nameInput.name = `genres[${index}].name`;
+            if (descInput) descInput.name = `genres[${index}].description`;
+        });
+    }
+    let genreIndex = /*[[${#lists.size(book.genres)}]]*/ 0;
+
+    function addGenre() {
+        const container = document.getElementById('genres-container');
+
+        const genreItem = document.createElement('div');
+        genreItem.className = 'genre-item border p-3 mb-2 rounded';
+
+        genreItem.innerHTML = `
+        <div class="row">
+            <div class="col-md-5">
+                <input type="text" name="genres[${genreIndex}].name" class="form-control" placeholder="Genre Name" />
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="genres[${genreIndex}].description" class="form-control" placeholder="Genre Description" />
+            </div>
+            <div class="col-md-2 text-end">
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeGenre(this)">Remove</button>
+            </div>
+        </div>
+    `;
+
+        container.appendChild(genreItem);
+        genreIndex++;
+    }
+
+    function removeGenre(button) {
+        const item = button.closest('.genre-item');
+        if (item) item.remove();
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

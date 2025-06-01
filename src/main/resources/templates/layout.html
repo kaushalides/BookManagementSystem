@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${#strings.isEmpty(title) ? 'Book Management System' : title}">Book Management System</title>
+
+    <!-- Bootstrap CSS (using Thymeleaf href) -->
+    <link th:href="@{/webjars/bootstrap/5.3.0/dist/css/bootstrap.min.css}" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link th:href="@{/webjars/bootstrap-icons/1.10.0/font/bootstrap-icons.css}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+
+    <!-- Page-specific CSS -->
+    <th:block th:replace="${#strings.isEmpty(css) ? ~{} : css}"></th:block>
+</head>
+<body>
+<!-- Navigation -->
+<div th:replace="~{fragments/navigation :: navigation}"></div>
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div th:replace="~{fragments/messages :: messages}"></div>
+            <div th:replace="${content}"></div>
+        </main>
+    </div>
+</div>
+
+<!-- Bootstrap Bundle with Popper -->
+<script th:src="@{/webjars/bootstrap/5.3.0/dist/js/bootstrap.bundle.min.js}"></script>
+
+<!-- Custom JS -->
+<script th:src="@{/js/app.js}"></script>
+
+<!-- Page-specific JS -->
+<th:block th:replace="${#strings.isEmpty(js) ? ~{} : js}"></th:block>
+</body>
+</html>
